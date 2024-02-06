@@ -47,17 +47,30 @@ public class ChainMaker : EditorWindow
         //Get the distance needed between each object
         float distanceBetweenObjects = Vector3.Distance(startPosition, endPosition) / (objectCount - 1);
 
-        //Instantiate middle chains
+        //Instantiate all but last link
         for(int i = 0; i < objectCount - 1; i++)
         {
             float distanceFromStart = distanceBetweenObjects * i;
             Vector3 spawnPosition = startPosition + (spawnDirection * distanceFromStart);
             GameObject spawnedObject = Instantiate(objectPrefab, spawnPosition, Quaternion.identity);
+            
+            if(i == 0)
+            {
+                spawnedObject.GetComponent<Rigidbody>().isKinematic = true;
+            }
+
+            if(i%2 == 0)
+            {
+                spawnedObject.transform.Rotate(spawnDirection * 90f);
+            }
+
             spawnedObjects.Add(spawnedObject);
         }
 
-        //Instantiate final chain
-        spawnedObjects.Add(Instantiate(objectPrefab, endPosition, Quaternion.identity));
+        //Instantiate final link
+        GameObject lastChainObject = Instantiate(objectPrefab, endPosition, Quaternion.identity);
+        lastChainObject.GetComponent<Rigidbody>().isKinematic = true;
+        spawnedObjects.Add(lastChainObject);
     }
 
     private void DeleteAllSpawnedObject()

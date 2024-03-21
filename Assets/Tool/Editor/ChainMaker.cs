@@ -40,12 +40,12 @@ public class ChainMaker : EditorWindow
 
     private void SpawnObjectsBetweenPoints()
     {
-        //Get a normalize vector for the direction of the line
         Vector3 spawnDirection = endPosition - startPosition;
         spawnDirection.Normalize();
 
-        //Get the distance needed between each object
         float distanceBetweenObjects = Vector3.Distance(startPosition, endPosition) / (objectCount - 1);
+
+        Rigidbody lastRB = null;
 
         //Instantiate all but last link
         for(int i = 0; i < objectCount - 1; i++)
@@ -58,11 +58,17 @@ public class ChainMaker : EditorWindow
             {
                 spawnedObject.GetComponent<Rigidbody>().isKinematic = true;
             }
+            else
+            {
+                spawnedObject.GetComponent<HingeJoint>().connectedBody = lastRB;
+            }
 
             if(i%2 == 0)
             {
                 spawnedObject.transform.Rotate(spawnDirection * 90f);
             }
+
+            lastRB = spawnedObject.GetComponent<Rigidbody>();
 
             spawnedObjects.Add(spawnedObject);
         }
